@@ -30,13 +30,13 @@ def main():
     )
     parser.add_argument(
         "-d", "--debug",
-        help="Print lots of debugging statements",
+        help="Print Logging Level DEBUG or higher",
         action="store_const", dest="loglevel", const=logging.DEBUG,
         default=logging.WARNING,
     )
     parser.add_argument(
         '-v', '--verbose',
-        help="Be verbose",
+        help="Print Logging Level INFO or higher",
         action="store_const", dest="loglevel", const=logging.INFO,
     )
     parser.add_argument(
