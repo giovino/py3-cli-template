@@ -53,7 +53,7 @@ def main():
         for line in fileinput.input(args.files):
             records.append(line.rstrip())
     except FileNotFoundError as e:
-        logging.info(e)
+        logging.warning(e)
         sys.exit(1)
 
     for record in records:
