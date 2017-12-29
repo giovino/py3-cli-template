@@ -1,7 +1,7 @@
 # py3-cli-template
 A simple template for creating a Python CLI tool that reads line-delimited data from files or standard input. 
 
-```bash
+```text
 $ ./cli.py -h
 
 usage: cli.py [-h] [-d] [-v] [--version] [FILE [FILE ...]]
