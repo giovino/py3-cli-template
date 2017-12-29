@@ -39,7 +39,10 @@ def main():
         help="Be verbose",
         action="store_const", dest="loglevel", const=logging.INFO,
     )
-    parser.add_argument("--version", action='version', version='%(prog)s {}'.format(VERSION))
+    parser.add_argument(
+        "--version", action='version',
+        version='%(prog)s {}'.format(VERSION),
+    )
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
 
