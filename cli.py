@@ -8,10 +8,16 @@ import sys
 import json
 import csv
 
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 
 
 def read_json(files):
+    """
+    Parses files formatted as JSON Lines
+
+    :param files: List of files
+    :return: List of dictionaries
+    """
 
     records = []
 
@@ -30,6 +36,13 @@ def read_json(files):
 
 
 def read_csv(files, delimiter):
+    """
+    Parses files formatted as CSV
+
+    :param files: List of files
+    :param delimiter: Single character (eg. "," or ";" or "|")
+    :return: List of lists
+    """
 
     try:
         records = csv.reader(fileinput.input(files), delimiter=delimiter)
@@ -40,16 +53,37 @@ def read_csv(files, delimiter):
     return records
 
 
+def read_newline(files):
+    """
+    Parses files formatted as line delimited
+
+    :param files: List of files
+    :return: List of strings
+    """
+
+    records = []
+
+    try:
+        for line in fileinput.input(files):
+            records.append(line.rstrip())
+    except FileNotFoundError as e:
+        logging.warning(e)
+        sys.exit(1)
+
+    return records
+
+
 def main():
 
     description = 'A simple template for creating a Python CLI tool that reads \n' \
-                  'line-delimited data from files or standard input.'
+                  'line-delimited, CSV or JSON Lines formatted data from files \n' \
+                  'or standard input.'
     epilog_text = '''Usage:
-    $ ./cli.py file1.csv
-    $ ./cli.py file1.csv --delimiter="|"
-    $ ./cli.py file1.csv file2.csv
+    $ ./cli.py file1.txt
+    $ ./cli.py file2.csv --csv
+    $ ./cli.py file2.csv --csv --delimiter="|"
     $ ./cli.py file3.jsonl --json
-    $ cat file1.csv | ./cli.py 
+    $ cat file1.csv | ./cli.py --csv
     '''
 
     parser = argparse.ArgumentParser(
@@ -60,6 +94,11 @@ def main():
     parser.add_argument(
         "files", metavar="FILE", nargs="*",
         help="files to read, if empty, stdin is used",
+        )
+    parser.add_argument(
+        "--csv",
+        help="read CSV formatted file",
+        dest="csv_format", action="store_true",
         )
     parser.add_argument(
         "--delimiter",
@@ -95,8 +134,10 @@ def main():
 
     if args.json_format:
         records = read_json(args.files)
-    else:
+    elif args.csv_format:
         records = read_csv(args.files, args.delimiter)
+    else:
+        records = read_newline(args.files)
 
     for record in records:
         print(record)
