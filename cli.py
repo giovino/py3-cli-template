@@ -44,14 +44,18 @@ def read_csv(files, delimiter):
     :return: List of lists
     """
 
+    records = []
+
     try:
-        records = csv.reader(fileinput.input(files), delimiter=delimiter)
+        csvreader_obj = csv.reader(fileinput.input(files), delimiter=delimiter)
     except FileNotFoundError as e:
         logging.warning(e)
         sys.exit(1)
 
-    return records
+    for r in csvreader_obj:
+        records.append(r)
 
+    return records
 
 def read_newline(files):
     """
