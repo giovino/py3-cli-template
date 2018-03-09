@@ -84,10 +84,11 @@ def main():
                   'or standard input.'
     epilog_text = '''Usage:
     $ ./cli.py file1.txt
-    $ ./cli.py file2.csv --csv
-    $ ./cli.py file2.csv --csv --delimiter="|"
-    $ ./cli.py file3.jsonl --json
-    $ cat file1.csv | ./cli.py --csv
+    $ ./cli.py file2.csv --input-format csv
+    $ ./cli.py file2.csv --input-format --input-delimiter="|"
+    $ ./cli.py file3.jsonl --input-format json
+    $ cat file1.csv | ./cli.py --input-format csv
+    $ ./cli.py file1.txt --output-filename file1.csv
     '''
 
     parser = argparse.ArgumentParser(
@@ -100,20 +101,16 @@ def main():
         help="files to read, if empty, stdin is used",
         )
     parser.add_argument(
-        "--csv",
-        help="read CSV formatted file",
-        dest="csv_format", action="store_true",
+        "-if", "--input-format",
+        help="Input file format [csv, json, line]",
+        dest="input_format", action="store",
+        default="line",
         )
     parser.add_argument(
-        "--delimiter",
+        "-id", "--input-delimiter",
         help="character used to separate csv fields",
         dest="delimiter", default=",",
     )
-    parser.add_argument(
-        "--json",
-        help="read JSON Lines formatted file",
-        dest="json_format", action="store_true",
-        )
     parser.add_argument(
         "-o", "--output-filename",
         help="Name of output file",
@@ -145,9 +142,9 @@ def main():
     if args.output_filename is None:
        args.output_filename = args.files[0]
 
-    if args.json_format:
+    if args.input_format.lower() == "json":
         records = read_json(args.files)
-    elif args.csv_format:
+    elif args.input_format.lower() == "csv":
         records = read_csv(args.files, args.delimiter)
     else:
         records = read_newline(args.files)

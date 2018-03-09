@@ -2,9 +2,8 @@
 A simple template for creating a Python CLI tool that reads line-delimited data from files or standard input. 
 
 ```text
-$ ./cli.py -h
-usage: cli.py [-h] [--csv] [--delimiter DELIMITER] [--json] [-v] [-d]
-              [--version]
+usage: cli.py [-h] [-if INPUT_FORMAT] [-id DELIMITER] [-o [OUTPUT_FILENAME]]
+              [-v] [-d] [--version]
               [FILE [FILE ...]]
 
 A simple template for creating a Python CLI tool that reads 
@@ -16,18 +15,21 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --csv                 read CSV formatted file
-  --delimiter DELIMITER
+  -if INPUT_FORMAT, --input-format INPUT_FORMAT
+                        Input file format [csv, json, line]
+  -id DELIMITER, --input-delimiter DELIMITER
                         character used to separate csv fields
-  --json                read JSON Lines formatted file
+  -o [OUTPUT_FILENAME], --output-filename [OUTPUT_FILENAME]
+                        Name of output file
   -v, --verbose         Print Logging Level INFO or higher
   -d, --debug           Print Logging Level DEBUG or higher
   --version             show program's version number and exit
 
 Usage:
     $ ./cli.py file1.txt
-    $ ./cli.py file2.csv --csv
-    $ ./cli.py file2.csv --csv --delimiter="|"
-    $ ./cli.py file3.jsonl --json
-    $ cat file1.csv | ./cli.py --csv
+    $ ./cli.py file2.csv --input-format csv
+    $ ./cli.py file2.csv --input-format --input-delimiter="|"
+    $ ./cli.py file3.jsonl --input-format json
+    $ cat file1.csv | ./cli.py --input-format csv
+    $ ./cli.py file1.txt --output-filename file1.csv
 ```
