@@ -8,7 +8,7 @@ import sys
 import json
 import csv
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 
 def read_json(files):
@@ -18,6 +18,8 @@ def read_json(files):
     :param files: List of files
     :return: List of dictionaries
     """
+
+    logging.debug("Reading JSON lines from input")
 
     records = []
 
@@ -44,6 +46,7 @@ def read_csv(files, delimiter):
     :return: List of lists
     """
 
+    logging.debug("Reading CSV from input")
     records = []
 
     try:
@@ -57,6 +60,7 @@ def read_csv(files, delimiter):
 
     return records
 
+
 def read_newline(files):
     """
     Parses files formatted as line delimited
@@ -65,6 +69,7 @@ def read_newline(files):
     :return: List of strings
     """
 
+    logging.debug("Reading line delimited from input")
     records = []
 
     try:
@@ -77,18 +82,101 @@ def read_newline(files):
     return records
 
 
+def write_csv(records, filename=None):
+    """
+    Write CSV formatted data to a file or stdout.
+
+    :param records:
+    :param filename:
+    :return:
+    """
+
+    if filename:
+        logging.debug("Writing csv data format to a file")
+        with open(filename, "w") as csv_file:
+            writer = csv.writer(csv_file, delimiter=',')
+            writer.writerows(records)
+    else:
+        logging.debug("Writing csv data format to stdout")
+        writer = csv.writer(sys.stdout, delimiter=',')
+        for record in records:
+            writer.writerow(record)
+    return
+
+
+def write_json(records, filename=None):
+    """
+    Write JSON lines formatted data to a file or stdout.
+
+    :param records:
+    :param filename:
+    :return:
+    """
+
+    if filename:
+        logging.debug("Writing json lines formatted data to a file")
+        with open(filename, "w") as f:
+            for record in records:
+                print(json.dumps(record), file=f)
+    else:
+        logging.debug("Writing json lines formatted data to stdout")
+        for record in records:
+            print(json.dumps(record))
+    return
+
+
+def write_line(records, filename=None):
+    """
+    Write line delimited data to a file or stdout.
+
+    :param records:
+    :param filename:
+    :return:
+    """
+
+    if filename:
+        logging.debug("Writing line delimited format to a file")
+        with open(filename, "w") as f:
+            for record in records:
+                print(record, file=f)
+    else:
+        logging.debug("Writing line delimited format to stdout")
+        for record in records:
+            print(record)
+    return
+
+
+def process_data(records):
+    """
+    Main function to process, enrich or transform data.
+
+    :param records:
+    :return:
+    """
+
+    logging.debug("Processing data")
+    # Data processing logic implemented here
+    for record in records:
+        pass
+
+    return records
+
+
 def main():
 
-    description = 'A simple template for creating a Python CLI tool that reads \n' \
-                  'line-delimited, CSV or JSON Lines formatted data from files \n' \
-                  'or standard input.'
+    description = 'A template for creating a Python CLI tool that reads and \n' \
+                  'writes line-delimited, CSV or JSON Lines formatted data \n' \
+                  'to and from files or standard input'
     epilog_text = '''Usage:
-    $ ./cli.py file1.txt
-    $ ./cli.py file2.csv --input-format csv
-    $ ./cli.py file2.csv --input-format --input-delimiter="|"
-    $ ./cli.py file3.jsonl --input-format json
+    $ ./cli.py data.txt
+    $ ./cli.py data.txt --input-format line
+    $ ./cli.py data.csv --input-format csv
+    $ ./cli.py data.csv --input-format csv --input-delimiter=","
+    $ ./cli.py data.jsonl --input-format json
+    $ ./cli.py data.txt --input-format line --output-format line --output-filename data1.txt
+    $ ./cli.py data.csv --input-format csv --output-format csv --output-filename data1.csv
+    $ ./cli.py data.jsonl --input-format json --output-format json --output-filename data1.jsonl
     $ cat file1.csv | ./cli.py --input-format csv
-    $ ./cli.py file1.txt --output-filename file1.csv
     '''
 
     parser = argparse.ArgumentParser(
@@ -112,10 +200,16 @@ def main():
         dest="delimiter", default=",",
     )
     parser.add_argument(
-        "-o", "--output-filename",
+        "-oformat", "--output-format",
+        help="Output format [csv, json, line]",
+        action="store",
+        dest="output_format", default="line",
+        )
+    parser.add_argument(
+        "-ofile", "--output-filename",
         help="Name of output file",
-        action="store", nargs="?",
-        dest="output_filename", default=None,
+        action="store",
+        dest="output_filename",
         )
     parser.add_argument(
         "-v", "--verbose",
@@ -139,9 +233,8 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    if args.output_filename is None:
-       args.output_filename = args.files[0]
-
+    #  Parse input files
+    logging.debug("Input Format: {}".format(args.input_format))
     if args.input_format.lower() == "json":
         records = read_json(args.files)
     elif args.input_format.lower() == "csv":
@@ -149,8 +242,26 @@ def main():
     else:
         records = read_newline(args.files)
 
-    for record in records:
-        print(record)
+    #  Process data
+    records = process_data(records)
+
+    #  Output data
+    logging.debug("Output filename: {}".format(args.output_filename))
+    logging.debug("Output format: {}".format(args.output_format))
+    if args.output_filename:
+        if args.output_format.lower() == "csv":
+            write_csv(records, args.output_filename)
+        elif args.output_format.lower() == "json":
+            write_json(records, args.output_filename)
+        else:
+            write_line(records, args.output_filename)
+    else:
+        if args.output_format.lower() == "csv":
+            write_csv(records)
+        elif args.output_format.lower() == "json":
+            write_json(records)
+        else:
+            write_line(records)
 
     sys.exit(0)
 
