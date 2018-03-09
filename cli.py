@@ -8,7 +8,7 @@ import sys
 import json
 import csv
 
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 
 def read_json(files):
@@ -115,6 +115,12 @@ def main():
         dest="json_format", action="store_true",
         )
     parser.add_argument(
+        "-o", "--output-filename",
+        help="Name of output file",
+        action="store", nargs="?",
+        dest="output_filename", default=None,
+        )
+    parser.add_argument(
         "-v", "--verbose",
         help="Print Logging Level INFO or higher",
         action="store_const", dest="loglevel", const=logging.INFO,
@@ -135,6 +141,9 @@ def main():
     if sys.stdin.isatty() and not args.files:
         parser.print_help()
         sys.exit(0)
+
+    if args.output_filename is None:
+       args.output_filename = args.files[0]
 
     if args.json_format:
         records = read_json(args.files)
